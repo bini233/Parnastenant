@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>버터치킨커리 임직원 대상 25% 할인 사전 예약</title>
+
+<!-- 카카오(구 다음) 우편번호 서비스 : 무료 / API 키 불필요
+     아래 JS에서 CDN 후보를 순서대로 시도해 동적으로 로드합니다.
+     (사내망·광고차단기 등으로 막힐 경우 직접 입력 모드로 자동 전환) -->
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root{
+    --bg:#ffffff;
+    --panel:#ffffff;
+    --muted-bg:#f7f7f7;
+    --line:#e6e6e6;
+    --line-2:#f0f0f0;
+    --text:#111;
+    --subtext:#666;
+    --muted:#888;
+    --danger:#d33;
+  }
+
+  body{
+    font-family:'Pretendard','Noto Sans KR', sans-serif;
+    margin:0; padding:20px; background:var(--bg); color:var(--text);
+  }
+
+  .page-wrapper{
+    max-width:900px; width:100%; margin:0 auto; background:var(--panel);
+    padding:25px; border-radius:12px; border:1px solid var(--line);
+  }
+
+  h1{ text-align:center; font-size:1.5em; margin:6px 0 18px; line-height:1.4; word-break:keep-all; }
+  h2{ margin-top:34px; font-size:1.15em; padding-left:10px; border-left:3px solid var(--line); }
+  a{ color:inherit; text-decoration:underline; text-underline-offset:2px; }
+
+  /* 모바일 입력창 자동 확대 방지 : 모든 입력 타입에 16px 보장 */
+  input[type="text"], input[type="tel"], input[type="email"], input[type="number"], select {
+    font-size: 16px !important;
+  }
+  input[type="text"], input[type="tel"], input[type="email"]{
+    width:100%; padding:10px 0; border:none; border-bottom:1px solid var(--line);
+    background:transparent; color:var(--text); -webkit-appearance:none;
+  }
+  input[type="text"]:focus, input[type="tel"]:focus, input[type="email"]:focus{
+    border-bottom:1px solid var(--text); outline:none;
+  }
+  input[readonly]{ color:var(--subtext); }
+
+  label{ display:block; font-weight:500; margin:16px 0 6px; }
+  label.required::after{ content:" *"; color:var(--danger); font-weight:700; vertical-align:super; font-size:0.85em; }
+
+  .field-help{ margin-top:6px; font-size:0.88em; color:var(--subtext); line-height:1.5; }
+
+  .info-box{
+    text-align:center; margin:10px 0 14px; padding:16px;
+    border:1px solid var(--line); border-radius:12px; line-height:1.7; background:#fff;
+  }
+  .info-box .info-item{ margin:6px 0; color:var(--subtext); }
+  .info-box .info-item strong{ color:var(--text); font-weight:700; }
+  .info-box .info-sub{ margin-top:12px; padding-top:12px; border-top:1px solid var(--line-2); color:var(--subtext); font-size:0.95em; }
+
+  /* 주문번호 배지 */
+  .order-no-badge{
+    margin:0 0 14px; padding:10px 14px; border:1px solid var(--line); border-radius:12px;
+    background:var(--muted-bg); font-size:0.95em; color:var(--subtext); text-align:center;
+  }
+  .copyable{
+    font:inherit; color:var(--text); font-weight:900; letter-spacing:0.4px;
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 12px;
+    cursor:pointer; -webkit-user-select:all; user-select:all;
+  }
+  .copyable:hover{ border-color:var(--text); }
+  .copyable:active{ transform:translateY(1px); }
+  .copyable.copied{ border-color:var(--text); background:var(--text); color:#fff; }
+  .copy-hint{ margin-top:6px; font-size:0.9em; }
+
+  /* 직전 주문 */
+  .last-order{
+    margin:0 0 18px; padding:16px; border:1px solid var(--line); border-radius:12px;
+    background:var(--muted-bg); line-height:1.6; text-align:center;
+  }
+  .last-order .lo-title{ font-weight:900; margin-bottom:8px; }
+  .last-order pre{
+    margin:8px 0 0; white-space:pre-wrap; word-break:break-all;
+    font-family:inherit; font-size:0.95em; color:var(--subtext); text-align:center;
+  }
+  .last-order .lo-close{
+    margin-top:12px; border:1px solid var(--line); border-radius:12px; background:#fff;
+    padding:8px 12px; cursor:pointer;
+  }
+  .last-order .lo-close:hover{ border-color:var(--text); }
+
+  /* 상품 안내 */
+  .offer-card{ border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:12px; background:#fff; }
+  .offer-title{ font-weight:900; margin-bottom:8px; }
+  .offer-meta{ color:var(--subtext); font-size:0.95em; line-height:1.6; }
+  .offer-pricebox{
+    margin-top:12px; padding:12px; background:var(--muted-bg);
+    border:1px solid var(--line); border-radius:12px; line-height:1.55;
+  }
+  .offer-pricebox .msrp{ color:var(--muted); text-decoration:line-through; margin-right:8px; display:inline-block; }
+  .offer-pricebox .final{ font-weight:900; font-size:1.15em; }
+  @media (max-width: 480px){
+    .offer-pricebox .msrp{ display:block; margin-right:0; margin-bottom:4px; }
+  }
+
+  /* 상품 이미지 */
+  .offer-gallery{ margin-top:12px; }
+  .offer-main{ width:100%; height:320px; object-fit:cover; border-radius:12px; background:var(--muted-bg); display:block; }
+  .offer-thumbs{ display:flex; gap:10px; margin-top:10px; }
+  .offer-thumbs img{
+    width:64px; height:64px; object-fit:cover; border-radius:8px; cursor:pointer;
+    border:2px solid transparent; opacity:0.6;
+  }
+  .offer-thumbs img:hover, .offer-thumbs img.active{ opacity:1; border-color:var(--text); }
+  @media (max-width: 480px){ .offer-main{ height:auto; aspect-ratio:5/4; } }
+
+  /* 배송지 슬롯 */
+  .dest-slot{ display:none; border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:12px; background:#fff; }
+  .dest-slot.active{ display:block; }
+  .dest-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding-bottom:10px; border-bottom:1px solid var(--line-2);
+  }
+  .dest-no{ font-weight:900; }
+  .dest-remove{
+    border:1px solid var(--line); border-radius:10px; background:#fff; padding:6px 12px;
+    font-size:14px; cursor:pointer; color:var(--subtext);
+  }
+  .dest-remove:hover{ border-color:var(--danger); color:var(--danger); }
+
+  .dest-add{
+    width:100%; margin-top:12px; border:1px dashed var(--line); border-radius:12px;
+    background:#fff; padding:14px; font-size:15px; font-weight:700; color:var(--text); cursor:pointer;
+  }
+  .dest-add:hover{ border-color:var(--text); }
+  .dest-hint{ margin-top:8px; font-size:0.88em; color:var(--subtext); line-height:1.5; text-align:center; }
+
+  .qty-stepper-inline{ display:flex; align-items:center; gap:10px; margin-top:6px; flex-wrap:wrap; }
+  .qty-btn{
+    width:42px; height:42px; border:1px solid var(--line); border-radius:12px;
+    background:#fff; color:var(--text); font-size:20px; cursor:pointer;
+  }
+  .qty-btn:hover{ border-color:var(--text); }
+  .qty-btn:active{ transform:translateY(1px); }
+  .qty-stepper-inline .qty-input{
+    width:84px; padding:10px 0; border:1px solid var(--line); border-radius:12px;
+    text-align:center; background:#fff;
+  }
+  .qty-amount{ margin-left:auto; font-weight:800; color:var(--text); }
+
+  /* 주소 검색 */
+  .addr-row{ display:flex; gap:10px; align-items:center; }
+  .addr-row input{ flex:1; min-width:0; }
+  .addr-search-btn{
+    flex:0 0 auto; border:1px solid var(--text); border-radius:12px; background:#fff;
+    color:var(--text); padding:11px 16px; font-size:15px; font-weight:700; cursor:pointer; white-space:nowrap;
+  }
+  .addr-search-btn:hover{ background:var(--text); color:#fff; }
+
+  .addr-alert{
+    display:none; margin-top:10px; padding:12px 14px; border:1px solid var(--danger);
+    border-radius:12px; color:var(--danger); background:#fff; line-height:1.6; font-size:0.95em;
+  }
+  .addr-alert.show{ display:block; }
+  .addr-notice{
+    display:none; margin-top:10px; padding:12px 14px; border:1px solid var(--line);
+    border-radius:12px; background:var(--muted-bg); color:var(--subtext); line-height:1.6; font-size:0.95em;
+  }
+  .addr-notice.show{ display:block; }
+
+  .postcode-dim{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; }
+  .postcode-dim.show{ display:block; }
+  .postcode-layer{
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(500px, calc(100vw - 32px)); background:#fff; border:1px solid var(--line);
+    border-radius:12px; overflow:hidden; z-index:1001;
+  }
+  .postcode-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; border-bottom:1px solid var(--line); font-weight:900;
+  }
+  .postcode-head button{ border:1px solid var(--line); border-radius:10px; background:#fff; padding:6px 12px; font-size:15px; cursor:pointer; }
+  #postcodeEmbed{ height:min(460px, calc(100vh - 160px)); }
+  #postcodeEmbed iframe{ width:100% !important; height:100% !important; border:0; }
+
+  /* 합계 */
+  .total-box{
+    margin-top:16px; padding:16px; background:var(--muted-bg); border-radius:12px;
+    border:1px solid var(--line); line-height:1.7;
+  }
+  .total-box .total-line{ display:flex; justify-content:space-between; align-items:baseline; color:var(--subtext); font-size:0.95em; }
+  .total-box .total-final{
+    display:flex; justify-content:space-between; align-items:baseline; margin-top:8px;
+    padding-top:8px; border-top:1px solid var(--line); font-weight:900; font-size:1.1em; color:var(--text);
+  }
+
+  .pay-highlight{
+    margin-top:12px; padding:14px 16px; background:var(--muted-bg);
+    border:1px solid var(--line); border-radius:12px; color:var(--text); line-height:1.6;
+  }
+  .pay-highlight .pay-note{ margin-top:6px; font-size:0.92em; color:var(--subtext); }
+
+  /* 개인정보 동의 */
+  .consent-box{ margin-top:28px; padding:16px; background:var(--muted-bg); border:1px solid var(--line); border-radius:12px; line-height:1.65; }
+  .consent-title{ font-weight:900; margin-bottom:10px; }
+  .consent-section{ padding-top:12px; margin-top:12px; border-top:1px solid var(--line-2); }
+  .consent-section:first-child{ border-top:none; margin-top:0; padding-top:0; }
+  .consent-subtitle{ font-weight:800; margin-bottom:6px; }
+  .consent-list{ margin:0; padding-left:18px; color:var(--subtext); font-size:0.95em; }
+  .consent-check{ display:flex; gap:10px; align-items:flex-start; margin-top:10px; padding-top:8px; }
+  .consent-check input[type="checkbox"]{ margin-top:4px; width:18px; height:18px; accent-color:var(--text); }
+  .consent-check label{ margin:0; font-weight:800; }
+  .consent-required{ font-size:0.9em; color:var(--subtext); margin-top:6px; }
+
+  button[type="submit"]{
+    width:100%; padding:18px; background:var(--text); color:#fff; border:1px solid var(--text);
+    border-radius:12px; margin-top:30px; cursor:pointer; font-size:1.3em; font-weight:800;
+  }
+  button[type="submit"]:hover{ background:#fff; color:var(--text); }
+  button[type="submit"]:disabled{ background:#bbb; border-color:#bbb; color:#fff; cursor:not-allowed; }
+</style>
+</head>
+
+<body>
+<div class="page-wrapper">
+
+  <!-- ▼▼ 회사명 수정 위치 ▼▼ -->
+  <h1>파르나스타워 입주사 임직원 대상<br>버터 치킨 커리 & 난 25% 할인 사전 예약</h1>
+  <!-- ▲▲ 회사명 수정 위치 ▲▲ -->
+
+  <div class="last-order" id="lastOrderBox" style="display:none;">
+    <div class="lo-title">이 기기에서 접수된 직전 주문</div>
+    <button type="button" class="copyable" id="lastOrderNo" data-copy="">-</button>
+    <pre id="lastOrderText"></pre>
+    <button type="button" class="lo-close" id="lastOrderClose">닫기</button>
+  </div>
+
+  <div class="info-box">
+    <!-- ▼▼ 예약 기간 / 발송 시작일 수정 위치 ▼▼ -->
+    <div class="info-item"><strong>예약 기간</strong> : 2026.08.21. - 27.</div>
+    <div class="info-item"><strong>문의</strong> : 신사업팀 이혜빈 (02-559-7594 / <a href="mailto:newbiz@parnas.co.kr">newbiz@parnas.co.kr</a>)</div>
+
+    <div class="info-sub">
+      <div class="info-item"><strong>구매 방법</strong></div>
+      <div class="info-item">아래 주문서를 작성 후 제출해주세요.</div>
+
+      <div class="info-item" style="margin-top:10px;"><strong>결제 방법</strong></div>
+      <div class="info-item">주문서 확인 후 주말 및 공휴일을 제외한 다음 영업일 내 입력 연락처로 결제 링크가 포함된 안내 문자가 발송됩니다.</div>
+
+      <div class="info-item" style="margin-top:10px;"><strong>배송 안내</strong></div>
+      <div class="info-item">✓ 결제 완료 건에 한하여 9월 14일 이후 순차 발송됩니다.</div>
+      <div class="info-item">✓ 한 주문당 최대 5개 배송지까지 나눠 받으실 수 있으며, 결제는 한 번에 진행됩니다.</div>
+      <div class="info-item">✓ 배송지를 나누셔도 추가 배송비는 발생하지 않습니다.</div>
+      <div class="info-item">✓ 기상악화 및 공휴일, 연휴 등의 사유로 배송이 지연될 수 있습니다.</div>
+      <div class="info-item">✓ 제주 지역은 배송이 불가하며 주문 시 자동 취소됩니다.</div>
+    </div>
+  </div>
+
+  <div class="order-no-badge">
+    주문번호 <button type="button" class="copyable" id="orderNoView" data-copy="">-</button>
+    <div class="copy-hint">탭하면 주문번호가 복사됩니다.<br>문의 시 이 번호를 알려주세요.</div>
+  </div>
+
+  <form id="orderForm"
+        name="curry-preorder"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thanks/">
+
+    <input type="hidden" name="form-name" value="curry-preorder" />
+    <p style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+    <h2>1. 주문자 정보</h2>
+    <label class="required">주문자 이름</label>
+    <input type="text" name="주문자 이름" id="buyerName" placeholder="예시: 홍길동" required>
+
+    <label class="required">주문자 이메일</label>
+    <input type="email" name="주문자 이메일" id="buyerEmail" inputmode="email" autocomplete="email" placeholder="예시: hong@company.co.kr" required>
+    <div class="field-help">임직원 확인 및 주문 관련 안내 발송에 사용됩니다. 사내 이메일로 입력해주세요.</div>
+
+    <h2>2. 사전 예약 상품</h2>
+    <div class="offer-card">
+      <div class="offer-title">[25% 할인] 버터치킨커리 &amp; 난 (2인분) x 3개</div>
+      <div class="offer-meta">상품 구성 : 난, 탄두리치킨 닭다리살(브라질산), 마크니 커리<br>보관 방법 : 냉동 보관 / 소비기한 제조일자로부터 1년</div>
+
+      <div class="offer-gallery" id="offerGallery">
+        <img class="offer-main" id="offerMain" src="./assets/curry.png" alt="버터치킨커리 & 난"
+             onerror="document.getElementById('offerGallery').style.display='none';">
+        <div class="offer-thumbs" id="offerThumbs">
+          <img src="./assets/curry.png"  class="active" alt="이미지 1">
+          <img src="./assets/curry2.png" alt="이미지 2" onerror="this.style.display='none';">
+          <img src="./assets/curry3.png" alt="이미지 3" onerror="this.style.display='none';">
+        </div>
+      </div>
+
+      <div class="offer-pricebox">
+        <div>1세트 = 버터치킨커리(2인분) x 3개</div>
+        <div style="margin-top:8px;">
+          <span class="msrp">정가 40,500원</span>
+          <span>→ 25% 할인 <span class="final">30,375원</span></span>
+        </div>
+        <div style="margin-top:8px; color:var(--subtext); font-size:0.95em;">
+          수량은 아래 배송 정보에서 배송지별로 지정해주세요.
+        </div>
+      </div>
+    </div>
+
+    <h2>3. 배송 정보</h2>
+    <div class="field-help" style="margin-bottom:4px;">
+      배송지를 나눠 받으실 경우 아래 &lsquo;배송지 추가&rsquo; 버튼을 눌러주세요. 최대 5곳까지 가능하며, 추가 배송비는 없습니다.
+    </div>
+
+    <div id="destWrap">
+      <div class="dest-slot active" data-slot="1" data-jeju="0">
+        <div class="dest-head">
+          <span class="dest-no">배송지 1</span>
+          <button type="button" class="dest-remove" data-remove="1">삭제</button>
+        </div>
+        <label class="required">수량 (1세트 = 3개 묶음)</label>
+        <div class="qty-stepper-inline">
+          <button type="button" class="qty-btn" data-qty="minus" data-slot="1">−</button>
+          <input type="text" class="qty-input" name="배송지1_수량" id="qty1" inputmode="numeric" pattern="[0-9]*" value="1">
+          <button type="button" class="qty-btn" data-qty="plus" data-slot="1">＋</button>
+          <span class="qty-amount" id="amount1">0원</span>
+        </div>
+        <label class="required">수취인 이름</label>
+        <input type="text" name="배송지1_이름" id="name1" placeholder="예시: 홍길동">
+        <label class="required">수취인 전화번호</label>
+        <input type="tel" name="배송지1_연락처" id="phone1" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678">
+        <label class="required">수취인 주소</label>
+        <div class="addr-row">
+          <input type="text" name="배송지1_우편번호" id="zip1" inputmode="numeric" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" data-addr="1">주소 찾기</button>
+        </div>
+        <input type="text" name="배송지1_주소" id="addr1" placeholder="주소 찾기 버튼을 눌러주세요" readonly style="margin-top:10px;">
+        <input type="text" name="배송지1_상세주소" id="detail1" placeholder="상세주소 (동/호수 등)" style="margin-top:10px;">
+        <div class="addr-alert" id="jeju1">제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.</div>
+      </div>
+
+      <div class="dest-slot" data-slot="2" data-jeju="0">
+        <div class="dest-head">
+          <span class="dest-no">배송지 2</span>
+          <button type="button" class="dest-remove" data-remove="2">삭제</button>
+        </div>
+        <label class="required">수량 (1세트 = 3개 묶음)</label>
+        <div class="qty-stepper-inline">
+          <button type="button" class="qty-btn" data-qty="minus" data-slot="2">−</button>
+          <input type="text" class="qty-input" name="배송지2_수량" id="qty2" inputmode="numeric" pattern="[0-9]*" value="0">
+          <button type="button" class="qty-btn" data-qty="plus" data-slot="2">＋</button>
+          <span class="qty-amount" id="amount2">0원</span>
+        </div>
+        <label class="required">수취인 이름</label>
+        <input type="text" name="배송지2_이름" id="name2" placeholder="예시: 홍길동">
+        <label class="required">수취인 전화번호</label>
+        <input type="tel" name="배송지2_연락처" id="phone2" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678">
+        <label class="required">수취인 주소</label>
+        <div class="addr-row">
+          <input type="text" name="배송지2_우편번호" id="zip2" inputmode="numeric" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" data-addr="2">주소 찾기</button>
+        </div>
+        <input type="text" name="배송지2_주소" id="addr2" placeholder="주소 찾기 버튼을 눌러주세요" readonly style="margin-top:10px;">
+        <input type="text" name="배송지2_상세주소" id="detail2" placeholder="상세주소 (동/호수 등)" style="margin-top:10px;">
+        <div class="addr-alert" id="jeju2">제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.</div>
+      </div>
+
+      <div class="dest-slot" data-slot="3" data-jeju="0">
+        <div class="dest-head">
+          <span class="dest-no">배송지 3</span>
+          <button type="button" class="dest-remove" data-remove="3">삭제</button>
+        </div>
+        <label class="required">수량 (1세트 = 3개 묶음)</label>
+        <div class="qty-stepper-inline">
+          <button type="button" class="qty-btn" data-qty="minus" data-slot="3">−</button>
+          <input type="text" class="qty-input" name="배송지3_수량" id="qty3" inputmode="numeric" pattern="[0-9]*" value="0">
+          <button type="button" class="qty-btn" data-qty="plus" data-slot="3">＋</button>
+          <span class="qty-amount" id="amount3">0원</span>
+        </div>
+        <label class="required">수취인 이름</label>
+        <input type="text" name="배송지3_이름" id="name3" placeholder="예시: 홍길동">
+        <label class="required">수취인 전화번호</label>
+        <input type="tel" name="배송지3_연락처" id="phone3" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678">
+        <label class="required">수취인 주소</label>
+        <div class="addr-row">
+          <input type="text" name="배송지3_우편번호" id="zip3" inputmode="numeric" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" data-addr="3">주소 찾기</button>
+        </div>
+        <input type="text" name="배송지3_주소" id="addr3" placeholder="주소 찾기 버튼을 눌러주세요" readonly style="margin-top:10px;">
+        <input type="text" name="배송지3_상세주소" id="detail3" placeholder="상세주소 (동/호수 등)" style="margin-top:10px;">
+        <div class="addr-alert" id="jeju3">제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.</div>
+      </div>
+
+      <div class="dest-slot" data-slot="4" data-jeju="0">
+        <div class="dest-head">
+          <span class="dest-no">배송지 4</span>
+          <button type="button" class="dest-remove" data-remove="4">삭제</button>
+        </div>
+        <label class="required">수량 (1세트 = 3개 묶음)</label>
+        <div class="qty-stepper-inline">
+          <button type="button" class="qty-btn" data-qty="minus" data-slot="4">−</button>
+          <input type="text" class="qty-input" name="배송지4_수량" id="qty4" inputmode="numeric" pattern="[0-9]*" value="0">
+          <button type="button" class="qty-btn" data-qty="plus" data-slot="4">＋</button>
+          <span class="qty-amount" id="amount4">0원</span>
+        </div>
+        <label class="required">수취인 이름</label>
+        <input type="text" name="배송지4_이름" id="name4" placeholder="예시: 홍길동">
+        <label class="required">수취인 전화번호</label>
+        <input type="tel" name="배송지4_연락처" id="phone4" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678">
+        <label class="required">수취인 주소</label>
+        <div class="addr-row">
+          <input type="text" name="배송지4_우편번호" id="zip4" inputmode="numeric" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" data-addr="4">주소 찾기</button>
+        </div>
+        <input type="text" name="배송지4_주소" id="addr4" placeholder="주소 찾기 버튼을 눌러주세요" readonly style="margin-top:10px;">
+        <input type="text" name="배송지4_상세주소" id="detail4" placeholder="상세주소 (동/호수 등)" style="margin-top:10px;">
+        <div class="addr-alert" id="jeju4">제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.</div>
+      </div>
+
+      <div class="dest-slot" data-slot="5" data-jeju="0">
+        <div class="dest-head">
+          <span class="dest-no">배송지 5</span>
+          <button type="button" class="dest-remove" data-remove="5">삭제</button>
+        </div>
+        <label class="required">수량 (1세트 = 3개 묶음)</label>
+        <div class="qty-stepper-inline">
+          <button type="button" class="qty-btn" data-qty="minus" data-slot="5">−</button>
+          <input type="text" class="qty-input" name="배송지5_수량" id="qty5" inputmode="numeric" pattern="[0-9]*" value="0">
+          <button type="button" class="qty-btn" data-qty="plus" data-slot="5">＋</button>
+          <span class="qty-amount" id="amount5">0원</span>
+        </div>
+        <label class="required">수취인 이름</label>
+        <input type="text" name="배송지5_이름" id="name5" placeholder="예시: 홍길동">
+        <label class="required">수취인 전화번호</label>
+        <input type="tel" name="배송지5_연락처" id="phone5" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678">
+        <label class="required">수취인 주소</label>
+        <div class="addr-row">
+          <input type="text" name="배송지5_우편번호" id="zip5" inputmode="numeric" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" data-addr="5">주소 찾기</button>
+        </div>
+        <input type="text" name="배송지5_주소" id="addr5" placeholder="주소 찾기 버튼을 눌러주세요" readonly style="margin-top:10px;">
+        <input type="text" name="배송지5_상세주소" id="detail5" placeholder="상세주소 (동/호수 등)" style="margin-top:10px;">
+        <div class="addr-alert" id="jeju5">제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.</div>
+      </div>
+    </div>
+
+    <button type="button" class="dest-add" id="destAdd">+ 배송지 추가</button>
+    <div class="dest-hint" id="destHint">배송지는 최대 5곳까지 추가할 수 있습니다.</div>
+
+    <div class="addr-notice" id="addrNotice">
+      주소 검색 서비스에 연결하지 못했습니다. 우편번호와 주소를 직접 입력해주세요.
+    </div>
+
+    <div class="total-box">
+      <div class="total-line"><span>총 수량</span><span><span id="totalQty">0</span>세트</span></div>
+      <div class="total-line"><span>배송지</span><span><span id="totalDest">1</span>곳</span></div>
+      <div class="total-final"><span>총 결제 예정 금액</span><span><span id="grandTotal">0</span>원</span></div>
+    </div>
+
+    <h2>4. 결제 방식</h2>
+    <div class="pay-highlight">
+      주문서 제출 후 주말 및 공휴일을 제외한 다음 영업일 내 입력해주신 연락처로 결제 링크가 포함된 안내 문자가 발송됩니다.
+      <div class="pay-note">※ 문자는 02-559-5656 번호로 발송됩니다.<br>※ 결제 링크를 받은 다음 영업일까지 결제가 완료되지 않으면 주문이 자동 취소됩니다.<br>※ 배송지를 여러 곳으로 나누셔도 결제는 전체 금액에 대해 한 번만 진행됩니다.</div>
+    </div>
+
+    <label class="required">결제 링크 받으실 전화번호</label>
+    <input type="tel" name="카드결제 연락처" id="payPhone" class="phone-input" inputmode="numeric" pattern="[0-9\-]*" maxlength="13" placeholder="예시: 010-1234-5678" required>
+
+    <input type="hidden" name="주문번호" id="orderNoInput">
+    <input type="hidden" name="배송지 수" id="destCountInput">
+    <input type="hidden" name="총 수량" id="totalQtyInput">
+    <input type="hidden" name="주문 내역" id="orderSummaryInput">
+    <input type="hidden" name="총액" id="totalAmountInput">
+
+    <div class="consent-box">
+      <div class="consent-title">개인정보 동의</div>
+
+      <div class="consent-section">
+        <div class="consent-subtitle">1) 개인정보 수집 및 이용 동의</div>
+        <ul class="consent-list">
+          <li>수집하는 개인정보 항목: 주문자 이름, 주문자 이메일, 수취인 이름, 수취인 연락처, 수취인 주소, 카드결제 연락처</li>
+          <li>수집 및 이용 목적: 임직원 확인, 사전 예약 상품 주문 취합 및 관련 안내, 결제 링크 발송 및 배송</li>
+          <li>보유 및 이용기간: 배송 완료 후 1개월간 보관 후 폐기</li>
+        </ul>
+        <div class="consent-check">
+          <input type="checkbox" id="agreeCollect" name="개인정보 수집 및 이용 동의" required>
+          <label for="agreeCollect">개인정보 수집 및 이용에 동의합니다. (필수)</label>
+        </div>
+      </div>
+
+      <div class="consent-section">
+        <div class="consent-subtitle">2) 개인정보 제3자 제공 동의</div>
+        <ul class="consent-list">
+          <li>제공받는 자: (주)마이셰프</li>
+          <li>제공받는 자의 이용 목적: 버터치킨커리 상품 배송</li>
+          <li>제공하는 항목: 수취인 이름, 수취인 연락처, 수취인 주소</li>
+          <li>제공받는 자의 보유 및 이용기간: 배송 완료 후 1개월간 보관 후 폐기</li>
+        </ul>
+        <div class="consent-check">
+          <input type="checkbox" id="agreeThirdParty" name="개인정보 제3자 제공 동의" required>
+          <label for="agreeThirdParty">개인정보 제3자 제공에 동의합니다. (필수)</label>
+        </div>
+      </div>
+
+      <div class="consent-required">※ 필수 동의 항목에 체크해야 주문서 제출이 가능합니다.</div>
+    </div>
+
+    <button type="submit" id="submitBtn">주문서 제출하기</button>
+  </form>
+</div>
+
+<div class="postcode-dim" id="postcodeDim"></div>
+<div class="postcode-layer" id="postcodeLayer" style="display:none;">
+  <div class="postcode-head">
+    <span>주소 검색</span>
+    <button type="button" id="postcodeClose">닫기</button>
+  </div>
+  <div id="postcodeEmbed"></div>
+</div>
+
+<script>
+/* =========================================================
+   상수  ▼ 가격/할인율 수정 위치
+========================================================= */
+const MAX_SLOTS   = 5;
+const UNIT_MSRP   = 40500;                                   // 1세트 정가 (13,500 x 3)
+const DISCOUNT    = 0.25;                                    // 할인율 25%
+const UNIT_FINAL  = Math.round(UNIT_MSRP * (1 - DISCOUNT));  // 30,375
+
+const ORDER_NO_KEY   = "bcc_order_no";
+const LAST_ORDER_KEY = "bcc_last_order";
+
+/* =========================================================
+   상품 이미지 갤러리
+========================================================= */
+(function initGallery(){
+  const main = document.getElementById("offerMain");
+  const thumbs = document.getElementById("offerThumbs");
+  if (!main || !thumbs) return;
+  thumbs.addEventListener("click", function(e){
+    if (e.target.tagName !== "IMG") return;
+    main.src = e.target.src;
+    thumbs.querySelectorAll("img").forEach(t => t.classList.remove("active"));
+    e.target.classList.add("active");
+  });
+})();
+
+/* =========================================================
+   주문번호 : 탭 단위로 1개만 발급 (새로고침해도 유지)
+========================================================= */
+function makeOrderNo(){
+  const d = new Date();
+  const ymd = d.getFullYear().toString().slice(2)
+    + String(d.getMonth()+1).padStart(2,"0")
+    + String(d.getDate()).padStart(2,"0");
+  const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  return `BCC-${ymd}-${rand}`;
+}
+
+function getOrderNo(){
+  let no = null;
+  try { no = sessionStorage.getItem(ORDER_NO_KEY); } catch(e){}
+  if(!no){
+    no = makeOrderNo();
+    try { sessionStorage.setItem(ORDER_NO_KEY, no); } catch(e){}
+  }
+  return no;
+}
+
+const orderNo = getOrderNo();
+document.getElementById("orderNoView").textContent = orderNo;
+document.getElementById("orderNoView").dataset.copy = orderNo;
+document.getElementById("orderNoInput").value = orderNo;
+
+function copyToClipboard(text){
+  if (navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    ok ? resolve() : reject(new Error("copy failed"));
+  });
+}
+
+function bindCopy(el){
+  if (!el) return;
+  el.addEventListener("click", function(){
+    const text = el.dataset.copy || el.textContent.trim();
+    if (!text || text === "-") return;
+    const original = el.textContent;
+    copyToClipboard(text).then(() => {
+      el.textContent = "복사됨";
+      el.classList.add("copied");
+      setTimeout(() => { el.textContent = original; el.classList.remove("copied"); }, 1200);
+    }).catch(() => {
+      prompt("아래 주문번호를 길게 눌러 복사해주세요.", text);
+    });
+  });
+}
+bindCopy(document.getElementById("orderNoView"));
+
+/* 직전 주문 내역 표시 (같은 브라우저 한정) */
+(function showLastOrder(){
+  let raw = null;
+  try { raw = localStorage.getItem(LAST_ORDER_KEY); } catch(e){}
+  if(!raw) return;
+  try{
+    const saved = JSON.parse(raw);
+    const btn = document.getElementById("lastOrderNo");
+    btn.textContent = saved.orderNo;
+    btn.dataset.copy = saved.orderNo;
+    bindCopy(btn);
+    document.getElementById("lastOrderText").textContent =
+      `접수일시: ${saved.at}\n\n${saved.summary.replace(/^주문번호:.*\n?/, "").trim()}`;
+    document.getElementById("lastOrderBox").style.display = "block";
+  }catch(e){}
+})();
+
+document.getElementById("lastOrderClose").addEventListener("click", ()=>{
+  document.getElementById("lastOrderBox").style.display = "none";
+});
+
+/* =========================================================
+   배송지 슬롯
+   슬롯 1~5는 HTML에 미리 존재하고(Netlify 필드 인식용),
+   활성화된 개수만큼만 화면에 보여준다.
+========================================================= */
+let activeSlots = 1;
+
+const destAddBtn = document.getElementById("destAdd");
+const destHintEl = document.getElementById("destHint");
+
+function slot(i){ return document.querySelector('.dest-slot[data-slot="' + i + '"]'); }
+function fld(prefix, i){ return document.getElementById(prefix + i); }
+
+function getQty(i){
+  const v = parseInt(fld("qty", i).value, 10);
+  return isNaN(v) || v < 0 ? 0 : v;
+}
+
+function readSlot(i){
+  return {
+    qty:    fld("qty", i).value,
+    name:   fld("name", i).value,
+    phone:  fld("phone", i).value,
+    zip:    fld("zip", i).value,
+    addr:   fld("addr", i).value,
+    detail: fld("detail", i).value,
+    jeju:   slot(i).dataset.jeju
+  };
+}
+
+function writeSlot(i, d){
+  fld("qty", i).value    = d.qty;
+  fld("name", i).value   = d.name;
+  fld("phone", i).value  = d.phone;
+  fld("zip", i).value    = d.zip;
+  fld("addr", i).value   = d.addr;
+  fld("detail", i).value = d.detail;
+  slot(i).dataset.jeju   = d.jeju;
+  document.getElementById("jeju" + i).classList.toggle("show", d.jeju === "1");
+}
+
+function clearSlot(i){
+  writeSlot(i, { qty:"0", name:"", phone:"", zip:"", addr:"", detail:"", jeju:"0" });
+}
+
+function renderSlots(){
+  for (let i = 1; i <= MAX_SLOTS; i++){
+    slot(i).classList.toggle("active", i <= activeSlots);
+    slot(i).querySelector(".dest-remove").style.display = activeSlots > 1 ? "" : "none";
+  }
+  destAddBtn.style.display = activeSlots < MAX_SLOTS ? "" : "none";
+  destHintEl.textContent = activeSlots < MAX_SLOTS
+    ? `배송지는 최대 ${MAX_SLOTS}곳까지 추가할 수 있습니다. (현재 ${activeSlots}곳)`
+    : `배송지 ${MAX_SLOTS}곳을 모두 사용 중입니다. 더 필요하시면 주문서를 한 번 더 작성해주세요.`;
+  recalcTotal();
+}
+
+function addSlot(){
+  if (activeSlots >= MAX_SLOTS) return;
+  activeSlots++;
+  clearSlot(activeSlots);
+  fld("qty", activeSlots).value = "1";
+  renderSlots();
+  slot(activeSlots).scrollIntoView({ behavior:"smooth", block:"center" });
+  fld("name", activeSlots).focus({ preventScroll:true });
+}
+
+function removeSlot(i){
+  if (activeSlots <= 1) return;
+  for (let k = i; k < activeSlots; k++){
+    writeSlot(k, readSlot(k + 1));
+  }
+  clearSlot(activeSlots);
+  activeSlots--;
+  renderSlots();
+}
+
+function setQty(i, next){
+  const val = String(next).replace(/[^0-9]/g, "");
+  fld("qty", i).value = Math.max(0, parseInt(val, 10) || 0);
+  recalcTotal();
+}
+
+function recalcTotal(){
+  let totalQty = 0;
+  for (let i = 1; i <= activeSlots; i++){
+    const q = getQty(i);
+    document.getElementById("amount" + i).textContent = (q * UNIT_FINAL).toLocaleString() + "원";
+    totalQty += q;
+  }
+  const grand = totalQty * UNIT_FINAL;
+  document.getElementById("totalQty").textContent   = totalQty;
+  document.getElementById("totalDest").textContent  = activeSlots;
+  document.getElementById("grandTotal").textContent = grand.toLocaleString();
+  return { totalQty, grand };
+}
+
+destAddBtn.addEventListener("click", addSlot);
+
+document.getElementById("destWrap").addEventListener("click", function(e){
+  const rm = e.target.closest("[data-remove]");
+  if (rm){
+    const i = parseInt(rm.dataset.remove, 10);
+    if (confirm(`배송지 ${i}을(를) 삭제할까요?`)) removeSlot(i);
+    return;
+  }
+  const qb = e.target.closest("[data-qty]");
+  if (qb){
+    const i = parseInt(qb.dataset.slot, 10);
+    setQty(i, getQty(i) + (qb.dataset.qty === "plus" ? 1 : -1));
+    return;
+  }
+  const ab = e.target.closest("[data-addr]");
+  if (ab){
+    openPostcode(parseInt(ab.dataset.addr, 10));
+    return;
+  }
+});
+
+document.getElementById("destWrap").addEventListener("input", function(e){
+  if (e.target.classList.contains("qty-input")){
+    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    recalcTotal();
+  }
+});
+
+document.getElementById("destWrap").addEventListener("focusin", function(e){
+  if (e.target.classList.contains("qty-input")) e.target.select();
+});
+
+/* =========================================================
+   카카오(구 다음) 우편번호 서비스
+========================================================= */
+const addrNoticeEl = document.getElementById("addrNotice");
+const pcLayer = document.getElementById("postcodeLayer");
+const pcDim   = document.getElementById("postcodeDim");
+const pcEmbed = document.getElementById("postcodeEmbed");
+
+let targetSlot = 1;
+
+function checkJeju(zip, sido){
+  const z = parseInt(zip, 10);
+  const byZip  = z >= 63000 && z <= 63644;   // 제주특별자치도 우편번호 대역
+  const bySido = (sido || "").indexOf("제주") === 0;
+  return byZip || bySido;
+}
+
+const POSTCODE_URLS = [
+  "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
+  "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+];
+
+function getPostcodeCtor(){
+  return (window.kakao && window.kakao.Postcode)
+      || (window.daum  && window.daum.Postcode)
+      || null;
+}
+
+let postcodeLoading = null;
+function loadPostcodeScript(){
+  if (getPostcodeCtor()) return Promise.resolve();
+  if (postcodeLoading) return postcodeLoading;
+  postcodeLoading = new Promise((resolve, reject) => {
+    let i = 0;
+    (function tryNext(){
+      if (i >= POSTCODE_URLS.length){
+        postcodeLoading = null;
+        return reject(new Error("postcode script load failed"));
+      }
+      const s = document.createElement("script");
+      s.src = POSTCODE_URLS[i++];
+      s.onload  = () => getPostcodeCtor() ? resolve() : tryNext();
+      s.onerror = tryNext;
+      document.head.appendChild(s);
+    })();
+  });
+  return postcodeLoading;
+}
+
+let manualAddrMode = false;
+function enableManualAddress(){
+  if (manualAddrMode) return;
+  manualAddrMode = true;
+  for (let i = 1; i <= MAX_SLOTS; i++){
+    fld("zip", i).readOnly = false;
+    fld("addr", i).readOnly = false;
+    fld("addr", i).placeholder = "주소를 직접 입력해주세요";
+  }
+  document.querySelectorAll("[data-addr]").forEach(b => b.style.display = "none");
+  addrNoticeEl.classList.add("show");
+}
+
+function closePostcodeLayer(){
+  pcLayer.style.display = "none";
+  pcDim.classList.remove("show");
+  pcEmbed.innerHTML = "";
+}
+
+function handleAddressSelected(data){
+  const i = targetSlot;
+
+  let fullAddr = data.userSelectedType === "R" ? data.roadAddress : data.jibunAddress;
+  if (!fullAddr) fullAddr = data.address;
+
+  if (data.userSelectedType === "R") {
+    let extra = "";
+    if (data.bname && /[동|로|가]$/g.test(data.bname)) extra += data.bname;
+    if (data.buildingName && data.apartment === "Y") {
+      extra += (extra !== "" ? ", " + data.buildingName : data.buildingName);
+    }
+    if (extra !== "") fullAddr += " (" + extra + ")";
+  }
+
+  fld("zip", i).value  = data.zonecode;
+  fld("addr", i).value = fullAddr;
+
+  const jeju = checkJeju(data.zonecode, data.sido);
+  slot(i).dataset.jeju = jeju ? "1" : "0";
+  document.getElementById("jeju" + i).classList.toggle("show", jeju);
+
+  closePostcodeLayer();
+  fld("detail", i).focus();
+}
+
+function embedPostcode(Ctor){
+  pcLayer.style.display = "block";
+  pcDim.classList.add("show");
+  new Ctor({
+    oncomplete: handleAddressSelected,
+    onresize: function(size){ pcEmbed.style.height = size.height + "px"; },
+    submitMode: false,
+    width: "100%",
+    height: "100%",
+    theme: { searchBgColor: "#111111", queryTextColor: "#FFFFFF" }
+  }).embed(pcEmbed);
+}
+
+function openPostcode(i){
+  if (manualAddrMode) return;
+  targetSlot = i;
+  const Ctor = getPostcodeCtor();
+  if (Ctor) { embedPostcode(Ctor); return; }
+  loadPostcodeScript()
+    .then(() => embedPostcode(getPostcodeCtor()))
+    .catch(() => {
+      enableManualAddress();
+      alert("주소 검색 서비스에 연결하지 못했습니다. 우편번호와 주소를 직접 입력해주세요.");
+    });
+}
+
+document.getElementById("postcodeClose").addEventListener("click", closePostcodeLayer);
+pcDim.addEventListener("click", closePostcodeLayer);
+
+/* 읽기 전용 주소칸을 눌러도 검색창이 열리도록 */
+document.getElementById("destWrap").addEventListener("click", function(e){
+  if (manualAddrMode) return;
+  const t = e.target;
+  if (t.id && (t.id.startsWith("zip") || t.id.startsWith("addr"))){
+    const i = parseInt(t.id.replace(/\D/g, ""), 10);
+    if (i) openPostcode(i);
+  }
+});
+
+loadPostcodeScript().catch(() => {
+  console.warn("[postcode] 사전 로드 실패 — 버튼 클릭 시 다시 시도합니다.");
+});
+
+/* 직접 입력 모드일 때도 제주 여부를 계속 검사 */
+document.getElementById("destWrap").addEventListener("input", function(e){
+  if (!manualAddrMode) return;
+  const t = e.target;
+  if (!t.id || !t.id.startsWith("zip")) return;
+  const i = parseInt(t.id.replace(/\D/g, ""), 10);
+  if (!i) return;
+  const jeju = checkJeju(t.value, fld("addr", i).value);
+  slot(i).dataset.jeju = jeju ? "1" : "0";
+  document.getElementById("jeju" + i).classList.toggle("show", jeju);
+});
+
+/* =========================================================
+   전화번호 자동 하이픈
+========================================================= */
+const formatPhoneNumber = (value) => {
+  if (!value) return "";
+  value = value.replace(/[^0-9]/g, "");
+  if (value.startsWith("02")) {
+    if (value.length < 3) return value;
+    if (value.length < 6) return value.replace(/(\d{2})(\d{1,3})/, '$1-$2');
+    if (value.length < 10) return value.replace(/(\d{2})(\d{3})(\d{1,4})/, '$1-$2-$3');
+    return value.replace(/(\d{2})(\d{4})(\d{1,4})/, '$1-$2-$3');
+  } else {
+    if (value.length < 4) return value;
+    if (value.length < 7) return value.replace(/(\d{3})(\d{1,3})/, '$1-$2');
+    if (value.length < 11) return value.replace(/(\d{3})(\d{3})(\d{1,4})/, '$1-$2-$3');
+    return value.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+  }
+};
+
+document.addEventListener("input", function(e){
+  if (e.target.classList && e.target.classList.contains("phone-input")){
+    e.target.value = formatPhoneNumber(e.target.value);
+  }
+});
+
+/* =========================================================
+   검증 + 제출
+========================================================= */
+const form = document.getElementById("orderForm");
+const submitBtn = document.getElementById("submitBtn");
+let submitting = false;
+
+function buildSummary(totalQty, grand){
+  const buyer = document.getElementById("buyerName").value.trim();
+  const email = document.getElementById("buyerEmail").value.trim();
+
+  let lines = [];
+  for (let i = 1; i <= activeSlots; i++){
+    const q = getQty(i);
+    lines.push(
+      `[배송지 ${i}] ${fld("name", i).value.trim()} / ${fld("phone", i).value.trim()}\n` +
+      `  (${fld("zip", i).value}) ${fld("addr", i).value} ${fld("detail", i).value.trim()}\n` +
+      `  ${q}세트 = ${(q * UNIT_FINAL).toLocaleString()}원`
+    );
+  }
+
+  return `주문번호: ${orderNo}
+주문자: ${buyer} (${email})
+배송지: ${activeSlots}곳 / 총 ${totalQty}세트
+총액: ${grand.toLocaleString()}원
+
+[배송 내역]
+${lines.join("\n")}`;
+}
+
+function validateForm(){
+  const { totalQty, grand } = recalcTotal();
+
+  if (!document.getElementById("buyerName").value.trim()){
+    alert("주문자 이름을 입력해주세요.");
+    document.getElementById("buyerName").focus();
+    return false;
+  }
+
+  const email = document.getElementById("buyerEmail").value.trim();
+  if (!email){
+    alert("주문자 이메일을 입력해주세요.");
+    document.getElementById("buyerEmail").focus();
+    return false;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    alert("이메일 주소 형식을 확인해주세요.");
+    document.getElementById("buyerEmail").focus();
+    return false;
+  }
+
+  if (totalQty <= 0){
+    alert("수량을 1세트 이상 선택해주세요.");
+    return false;
+  }
+
+  for (let i = 1; i <= activeSlots; i++){
+    const goTo = (el, msg) => {
+      alert(`[배송지 ${i}] ${msg}`);
+      slot(i).scrollIntoView({ behavior:"smooth", block:"center" });
+      if (el) el.focus({ preventScroll:true });
+    };
+
+    if (getQty(i) <= 0){
+      goTo(fld("qty", i), "수량을 1세트 이상 입력해주세요. 필요 없는 배송지는 삭제해주세요.");
+      return false;
+    }
+    if (!fld("name", i).value.trim()){
+      goTo(fld("name", i), "수취인 이름을 입력해주세요.");
+      return false;
+    }
+    const phoneVal = fld("phone", i).value.replace(/[^0-9]/g, "");
+    if (!phoneVal || phoneVal.length < 9){
+      goTo(fld("phone", i), "수취인 전화번호를 다시 확인해주세요.");
+      return false;
+    }
+    if (!fld("zip", i).value || !fld("addr", i).value){
+      goTo(null, manualAddrMode
+        ? "우편번호와 주소를 입력해주세요."
+        : "주소 찾기 버튼을 눌러 배송지 주소를 선택해주세요.");
+      return false;
+    }
+    if (!fld("detail", i).value.trim()){
+      goTo(fld("detail", i), "상세주소를 입력해주세요.");
+      return false;
+    }
+    if (slot(i).dataset.jeju === "1"){
+      goTo(null, "제주 지역은 배송이 불가합니다. 다른 배송지 주소로 변경해주세요.");
+      return false;
+    }
+  }
+
+  const payPhone = document.getElementById("payPhone").value.replace(/[^0-9]/g, "");
+  if (!payPhone || payPhone.length < 9){
+    alert("결제 링크 받을 번호를 다시 확인해주세요.");
+    document.getElementById("payPhone").focus();
+    return false;
+  }
+
+  if (!document.getElementById("agreeCollect").checked ||
+      !document.getElementById("agreeThirdParty").checked) {
+    alert("개인정보 동의(수집·이용 / 제3자 제공)는 필수입니다. 체크 후 제출해주세요.");
+    return false;
+  }
+
+  // 사용하지 않는 슬롯은 값을 비워서 전송
+  for (let i = activeSlots + 1; i <= MAX_SLOTS; i++) clearSlot(i);
+
+  const summary = buildSummary(totalQty, grand);
+  document.getElementById("orderSummaryInput").value = summary;
+  document.getElementById("totalAmountInput").value  = grand;
+  document.getElementById("totalQtyInput").value     = totalQty;
+  document.getElementById("destCountInput").value    = activeSlots;
+
+  return confirm(summary + "\n\n주문 내용이 맞습니까?");
+}
+
+async function postOrder(url){
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(new FormData(form)).toString(),
+    redirect: "manual"
+  });
+}
+
+function isAccepted(res){
+  return res.ok || res.type === "opaqueredirect" || res.status === 0
+      || (res.status >= 300 && res.status < 400);
+}
+
+form.addEventListener("submit", async function(e){
+  e.preventDefault();
+  if (submitting) return;
+  if (!validateForm()) return;
+
+  submitting = true;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "제출 중입니다...";
+
+  let lastStatus = "network error";
+
+  try {
+    let res = await postOrder(window.location.pathname);
+    if (!isAccepted(res)) {
+      lastStatus = res.status;
+      console.error("[order] 1st attempt failed:", res.status, res.type);
+      res = await postOrder("/");
+    }
+    if (!isAccepted(res)) {
+      lastStatus = res.status;
+      throw new Error("status " + res.status);
+    }
+
+    try {
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify({
+        orderNo: orderNo,
+        at: new Date().toLocaleString("ko-KR"),
+        summary: document.getElementById("orderSummaryInput").value
+      }));
+      sessionStorage.removeItem(ORDER_NO_KEY);
+    } catch(err){}
+
+    window.location.replace("/thanks/");
+
+  } catch (err) {
+    console.error("[order] submit failed:", lastStatus, err);
+    submitting = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = "주문서 제출하기";
+
+    const retry = confirm(
+      "주문서 접수에 실패했습니다. (코드: " + lastStatus + ")\n\n" +
+      "확인을 누르면 기본 방식으로 다시 제출합니다.\n" +
+      "계속 실패하면 신사업팀(02-559-7594)으로 연락 부탁드립니다."
+    );
+    if (retry){
+      submitting = true;
+      submitBtn.disabled = true;
+      form.submit();
+    }
+  }
+});
+
+window.addEventListener("pageshow", function(e){
+  if (e.persisted){
+    submitting = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = "주문서 제출하기";
+  }
+});
+
+/* 초기 실행 */
+for (let i = 2; i <= MAX_SLOTS; i++) clearSlot(i);
+renderSlots();
+</script>
+
+</body>
+</html>
