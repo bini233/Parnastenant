@@ -17,7 +17,6 @@
     h1{margin:0 0 10px;font-size:22px;color:#2c3e50;text-align:center;letter-spacing:-0.2px;}
     p{margin:0;color:#556677;line-height:1.7;text-align:center;}
 
-    /* 주문번호 강조 */
     .order-no{
       margin:18px 0 0;padding:18px;border:1px solid #cfd6dd;border-radius:10px;
       background:#f7f9fb;text-align:center;
@@ -38,7 +37,6 @@
     .order-no .hint{margin-top:8px;font-size:13px;color:#7a8a99;}
     .order-no .at{margin-top:8px;font-size:13px;color:#7a8a99;}
 
-    /* 주문 내역 */
     .detail{
       margin-top:14px;padding:16px;border:1px solid #e9eef3;border-radius:10px;
       background:#fff;
@@ -55,8 +53,7 @@
 
     .box{
       margin-top:18px;padding:16px;background:#f7f9fb;border:1px solid #cfd6dd;border-radius:10px;
-      color:#2c3e50;line-height:1.7;
-      text-align:center;
+      color:#2c3e50;line-height:1.7;text-align:center;
     }
     .box a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
   </style>
@@ -85,7 +82,7 @@
     </div>
 
     <div class="box">
-      <div><strong>문의</strong> : <a href="mailto:newbiz@parnas.co.kr">newbiz@parnas.co.kr</a></div>
+      <div><strong>문의</strong> : 신사업팀 이혜빈 (02-559-7594 / <a href="mailto:newbiz@parnas.co.kr">newbiz@parnas.co.kr</a>)</div>
     </div>
   </div>
 
@@ -110,10 +107,18 @@ function copyToClipboard(text){
 }
 
 (function(){
-  var LAST_ORDER_KEY = "curry-preorder";; // 주문서 페이지에서 저장하는 키와 동일
+  /* 주문서 페이지가 localStorage에 저장하는 키.
+     ※ 폼 이름(curry-preorder)과는 다른 값이다.
+     프로젝트마다 키가 달라서 순서대로 찾는다. */
+  var KEYS = ["bcc_last_order", "emp_last_order", "phc_last_order"];
 
   var raw = null;
-  try { raw = localStorage.getItem(LAST_ORDER_KEY); } catch(e) {}
+  for (var i = 0; i < KEYS.length; i++){
+    try {
+      var v = localStorage.getItem(KEYS[i]);
+      if (v) { raw = v; break; }
+    } catch(e) {}
+  }
   if (!raw) return; // 직접 접속 등으로 저장된 주문이 없으면 기본 화면 유지
 
   var saved;
