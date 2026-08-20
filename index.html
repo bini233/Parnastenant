@@ -111,14 +111,17 @@
 
   /* 상품 이미지 */
   .offer-gallery{ margin-top:12px; }
-  .offer-main{ width:100%; height:320px; object-fit:cover; border-radius:12px; background:var(--muted-bg); display:block; }
+  .offer-main{
+    width:100%; height:auto; max-height:560px; object-fit:contain;
+    border-radius:12px; background:var(--muted-bg); display:block;
+  }
   .offer-thumbs{ display:flex; gap:10px; margin-top:10px; }
   .offer-thumbs img{
-    width:64px; height:64px; object-fit:cover; border-radius:8px; cursor:pointer;
+    width:64px; height:64px; object-fit:contain; background:var(--muted-bg);
+    border-radius:8px; cursor:pointer;
     border:2px solid transparent; opacity:0.6;
   }
   .offer-thumbs img:hover, .offer-thumbs img.active{ opacity:1; border-color:var(--text); }
-  @media (max-width: 480px){ .offer-main{ height:auto; aspect-ratio:5/4; } }
 
   /* 배송지 슬롯 */
   .dest-slot{ display:none; border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:12px; background:#fff; }
@@ -231,7 +234,7 @@
 <div class="page-wrapper">
 
   <!-- ▼▼ 회사명 수정 위치 ▼▼ -->
-  <h1>파르나스타워 입주사 임직원 대상<br>버터 치킨 커리 & 난 25% 할인 사전 예약</h1>
+  <h1>파르나스타워 입주사 임직원 대상<br>버터 치킨 커리 &amp; 난 25% 할인 사전 예약</h1>
   <!-- ▲▲ 회사명 수정 위치 ▲▲ -->
 
   <div class="last-order" id="lastOrderBox" style="display:none;">
